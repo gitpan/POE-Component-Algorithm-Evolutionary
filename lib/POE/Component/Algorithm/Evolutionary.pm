@@ -6,13 +6,7 @@ use warnings;
 use strict;
 use Carp;
 
-use version; our $VERSION = qv('0.0.3');
-
-# Other recommended modules (uncomment to use):
-#  use IO::Prompt;
-#  use Perl6::Export;
-#  use Perl6::Slurp;
-#  use Perl6::Say;
+use version; our $VERSION = qv('0.0.4');
 
 use POE;
 use Algorithm::Evolutionary;
@@ -41,6 +35,7 @@ sub new {
   return $self;
 }
 
+# Create stuff and get ready to go
 sub start {
   my ($kernel, $heap, $alias, $creator, 
       $single_step, $terminator, $fitness,$self )= 
@@ -58,6 +53,8 @@ sub start {
   $kernel->yield('generation');
 }
 
+
+#Evolve population
 sub generation {
   my ($kernel, $heap ) = @_[KERNEL, HEAP];
   $heap->{'single_step'}->apply( $heap->{'population'} );
@@ -69,61 +66,62 @@ sub generation {
 
 }
 
+#Finish here
 sub finishing {
   my ($kernel, $heap ) = @_[KERNEL, HEAP];
   print "Best is:\n\t ",$heap->{'population'}->[0]->asString()," Fitness: ",
     $heap->{'population'}->[0]->Fitness(),"\n";
 }
 
-1; # Magic true value required at end of module
+"Don't look further" ; # Magic true value required at end of module
 __END__
 
 =head1 NAME
 
-Poe::Component::Algorithm::Evolutionary - Run evolutionary algorithms in a preemptive multitasking way.
+POE::Component::Algorithm::Evolutionary - Run evolutionary algorithms in a preemptive multitasking way.
 
 
 =head1 VERSION
 
-This document describes Poe::Component::Algorithm::Evolutionary version 0.0.3
+This document describes POE::Component::Algorithm::Evolutionary version 0.0.3
 
 
 =head1 SYNOPSIS
 
-use Poe::Component::Algorithm::Evolutionary;
+  use POE::Component::Algorithm::Evolutionary;
 
-use Algorithm::Evolutionary qw( Individual::BitString Op::Creator 
-				Op::CanonicalGA Op::Bitflip 
-				Op::Crossover Op::GenerationalTerm
-				Fitness::Royal_Road);
+  use Algorithm::Evolutionary qw( Individual::BitString Op::Creator 
+				  Op::CanonicalGA Op::Bitflip 
+				  Op::Crossover Op::GenerationalTerm
+				  Fitness::Royal_Road);
 
-my $bits = shift || 64;
-my $block_size = shift || 4;
-my $pop_size = shift || 256; #Population size
-my $numGens = shift || 200; #Max number of generations
-my $selection_rate = shift || 0.2;
+  my $bits = shift || 64;
+  my $block_size = shift || 4;
+  my $pop_size = shift || 256; #Population size
+  my $numGens = shift || 200; #Max number of generations
+  my $selection_rate = shift || 0.2;
 
-#Initial population
-my $creator = new Algorithm::Evolutionary::Op::Creator( $pop_size, 'BitString', { length => $bits });
+  #Initial population
+  my $creator = new Algorithm::Evolutionary::Op::Creator( $pop_size, 'BitString', { length => $bits });
 
-# Variation operators
-my $m = Algorithm::Evolutionary::Op::Bitflip->new( 1 );
-my $c = Algorithm::Evolutionary::Op::Crossover->new(2, 4);
+  # Variation operators
+  my $m = Algorithm::Evolutionary::Op::Bitflip->new( 1 );
+  my $c = Algorithm::Evolutionary::Op::Crossover->new(2, 4);
 
-# Fitness function: create it and evaluate
-my $rr = new  Algorithm::Evolutionary::Fitness::Royal_Road( $block_size );
+  # Fitness function: create it and evaluate
+  my $rr = new  Algorithm::Evolutionary::Fitness::Royal_Road( $block_size );
 
-my $generation = Algorithm::Evolutionary::Op::CanonicalGA->new( $rr , $selection_rate , [$m, $c] ) ;
-my $gterm = new Algorithm::Evolutionary::Op::GenerationalTerm 10;
+  my $generation = Algorithm::Evolutionary::Op::CanonicalGA->new( $rr , $selection_rate , [$m, $c] ) ;
+  my $gterm = new Algorithm::Evolutionary::Op::GenerationalTerm 10;
 
-POE::Component::Algorithm::Evolutionary->new( Fitness => $rr,
-					      Creator => $creator,
-					      Single_Step => $generation,
-					      Terminator => $gterm,
-					      Alias => 'Canonical' );
+  POE::Component::Algorithm::Evolutionary->new( Fitness => $rr,
+						Creator => $creator,
+						Single_Step => $generation,
+						Terminator => $gterm,
+						Alias => 'Canonical' );
 
 
-$poe_kernel->run();
+  $poe_kernel->run();
 
 
 =head1 DESCRIPTION
@@ -159,7 +157,7 @@ Called when everything is over. Prints winner
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-Poe::Component::Algorithm::Evolutionary requires no configuration files or environment variables.
+POE::Component::Algorithm::Evolutionary requires no configuration files or environment variables.
 
 
 =head1 DEPENDENCIES
@@ -202,6 +200,10 @@ Copyright (c) 2009, JJ Merelo C<< <jj@merelo.net> >>. All rights reserved.
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
 
+  CVS Info: $Date: 2009/02/06 16:03:03 $ 
+  $Header: /cvsroot/opeal/Algorithm-Evolutionary/lib/Algorithm/Evolutionary/Wheel.pm,v 2.2 2009/02/06 16:03:03 jmerelo Exp $ 
+  $Author: jmerelo $ 
+  $Revision: 2.2 $ ' 
 
 =head1 DISCLAIMER OF WARRANTY
 
