@@ -1,16 +1,23 @@
 --- #YAML:1.0
-name:                POE-Component-Algorithm-Evolutionary
-version:             0.0.4
-abstract:            Run evolutionary algorithms in a preemptive multitasking way.
-license:             ~
-author:              
+name:               POE-Component-Algorithm-Evolutionary
+version:            0.0.4.1
+abstract:           Run evolutionary algorithms in a preemptive multitasking way.
+author:
     - JJ Merelo <jj@merelo.net>
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    Algorithm::Evolutionary:       0.61
-    Test::More:                    0
-    version:                       0
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Algorithm::Evolutionary:  0.61
+    POE:                  0
+    Test::More:           0
+    version:              0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.46
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

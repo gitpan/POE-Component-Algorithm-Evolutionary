@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use Carp;
 
-use version; our $VERSION = qv('0.0.4');
+use version; our $VERSION = qv('0.0.4.1');
 
 use POE;
 use Algorithm::Evolutionary;
@@ -200,10 +200,10 @@ Copyright (c) 2009, JJ Merelo C<< <jj@merelo.net> >>. All rights reserved.
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
 
-  CVS Info: $Date: 2009/02/06 16:03:03 $ 
-  $Header: /cvsroot/opeal/Algorithm-Evolutionary/lib/Algorithm/Evolutionary/Wheel.pm,v 2.2 2009/02/06 16:03:03 jmerelo Exp $ 
+  CVS Info: $Date: 2009/02/09 12:00:41 $ 
+  $Header: /cvsroot/opeal/POE-Component-Algorithm-Evolutionary/lib/POE/Component/Algorithm/Evolutionary.pm,v 1.3 2009/02/09 12:00:41 jmerelo Exp $ 
   $Author: jmerelo $ 
-  $Revision: 2.2 $ ' 
+  $Revision: 1.3 $ ' 
 
 =head1 DISCLAIMER OF WARRANTY
 

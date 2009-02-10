@@ -1,3 +1,7 @@
+2009-02-10  jmerelo  <jmerelo@localhost.localdomain>
+
+	* 0.0.4.1 lib/POE/Component/Algorithm/Evolutionary.pm (new): Forgot to include POE in the dependencies.
+
 2009-02-09  Juan Julian Merelo Guervos  <jmerelo@geneura.ugr.es>
 
 	* lib/POE/Component/Algorithm/Evolutionary.pm: Changing to 0.0.4
