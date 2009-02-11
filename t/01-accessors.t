@@ -2,6 +2,7 @@
 
 use lib qw( ../../lib ../lib ../../Algorithm-Evolutionary/lib );
 
+use Test::More tests => 5;
 use POE::Component::Algorithm::Evolutionary;
 use POE;
 
@@ -10,11 +11,13 @@ use Algorithm::Evolutionary qw( Individual::BitString Op::Creator
 				Op::Crossover Op::GenerationalTerm
 				Fitness::Royal_Road);
 
-my $bits = shift || 64;
-my $block_size = shift || 4;
-my $pop_size = shift || 256; #Population size
-my $numGens = shift || 200; #Max number of generations
-my $selection_rate = shift || 0.2;
+use Algorithm::Evolutionary::Utils qw(average);
+
+my $bits = 64;
+my $block_size = 4;
+my $pop_size = 256; #Population size
+my $numGens = 200; #Max number of generations
+my $selection_rate =  0.2;
 
 
 #----------------------------------------------------------#
@@ -35,13 +38,17 @@ my $rr = new  Algorithm::Evolutionary::Fitness::Royal_Road( $block_size );
 # defecto. Los parámetros son la función de fitness, la tasa de selección y los
 # operadores de variación.
 my $generation = Algorithm::Evolutionary::Op::CanonicalGA->new( $rr , $selection_rate , [$m, $c] ) ;
-my $gterm = new Algorithm::Evolutionary::Op::GenerationalTerm 10;
+my $gterm = new Algorithm::Evolutionary::Op::GenerationalTerm 3;
 
-POE::Component::Algorithm::Evolutionary->new( Fitness => $rr,
+my $poco_ae_session = POE::Component::Algorithm::Evolutionary->new( Fitness => $rr,
 					      Creator => $creator,
 					      Single_Step => $generation,
 					      Terminator => $gterm,
 					      Alias => 'Canonical' );
 
+for my $v ( qw( Fitness Creator Single_step Terminator ) ) {
+    ok( ref $poco_ae_session->$v , "Accessing $v method from AUTOLOAD"); 
+}
 
 $poe_kernel->run();
+ok( ref $poco_ae_session->population, "Accesing population" );
