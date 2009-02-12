@@ -1,8 +1,10 @@
-#!/usr/bin/perl
+#-*-CPerl-*-
 
 use lib qw( ../../lib ../lib ../../Algorithm-Evolutionary/lib );
 
-use Test::More tests => 1;
+use Test::More tests => 2;
+use Test::Output;
+
 use POE::Component::Algorithm::Evolutionary;
 use POE;
 
@@ -57,5 +59,14 @@ $poco_ae_session = POE::Component::Algorithm::Evolutionary->new( Fitness => $rr,
 $poe_kernel->run();
 ok( $this_average < average( $poco_ae_session->population ), 'Average improves with GA' );
 
+my $after_step = sub {  print $_[0]->[0]->asString(), "\n" }; #First argument is the population hashref
 
+$poco_ae_session = 
+  POE::Component::Algorithm::Evolutionary->new( Fitness => $rr,
+						Creator => $creator,
+						Single_Step => $generation,
+						Terminator => Algorithm::Evolutionary::Op::GenerationalTerm->new(10),
+						Alias => 'Canonical',
+						After_Step => $after_step);
 
+stdout_like( sub { $poe_kernel->run(); }, qr /[01]+ ->/, 'After step output' );

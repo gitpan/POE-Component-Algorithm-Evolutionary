@@ -12,6 +12,7 @@ WriteMakefile(
 		  'Test::More' => 0,
 		  'version'    => 0,
 		  'POE'        => 0,
+		  'Test::Output' => 0,
 		  'Algorithm::Evolutionary' => 0.61
 		 },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

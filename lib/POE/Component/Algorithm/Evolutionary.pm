@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use Carp;
 
-use version; our $VERSION = qv('0.0.5');
+use version; our $VERSION = qv('0.1.0');
 
 use POE;
 use Algorithm::Evolutionary;
@@ -44,15 +44,17 @@ sub new {
   my $terminator = delete $args{Terminator} || croak "Terminator required";
   my $alias = delete $args{Alias} || croak "Alias required";
   my $replacer = delete $args{Replacer};
+  my $after_step = delete $args{After_Step};
 
   my $self = { alias => $alias };
   bless $self, $class;
 
   my $session = POE::Session->create(inline_states => { _start => \&start,
-						      generation => \&generation,
-						      finish => \&finishing},
+							generation => \&generation,
+							after_step => \&after_step,
+							finish => \&finishing},
 				     args  => [$alias, $creator, $single_step, 
-					       $terminator, $fitness, $self]
+					       $terminator, $fitness, $replacer, $after_step, $self]
 				    );
   $self->{'session'} = $session;
   return $self;
@@ -61,14 +63,15 @@ sub new {
 # Create stuff and get ready to go
 sub start {
   my ($kernel, $heap, $alias, $creator, 
-      $single_step, $terminator, $fitness, $replacer, $self )= 
-	@_[KERNEL, HEAP, ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6];
+      $single_step, $terminator, $fitness, $replacer, $after_step, $self )= 
+	@_[KERNEL, HEAP, ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7];
   $kernel->alias_set($alias);
   $heap->{'single_step'} = $single_step;
   $heap->{'terminator' } = $terminator;
   $heap->{'creator' } = $creator;
   $heap->{'fitness' } = $fitness;
   $heap->{'replacer' } = $replacer;
+  $heap->{'after_step'} = $after_step;
   $heap->{'self'} = $self;
   my @pop;
   $creator->apply( \@pop );
@@ -81,10 +84,22 @@ sub start {
 sub new_population {
     my ($kernel, $heap, $new_population ) = @_[KERNEL, HEAP, ARG0];
     if ( $heap->{'replacer'} ) {
-	$heap->{'replacer'}->apply($heap->{'population'}, $new_population ), 
+	$heap->{'replacer'}->apply($heap->{'population'}, $new_population ); 
     } else {
 	splice( @{$heap->{'population'}}, -@{$new_population} ); 
 	push @{$heap->{'population'}}, @{$new_population} ; 
+    }
+    $kernel->yield('generation');
+}
+
+sub after_step {
+    my ($kernel, $heap, $arg ) = @_[KERNEL, HEAP, ARG0];
+    if ( $heap->{'after_step'} ){
+	if ( ref $heap->{'after_step'} eq 'CODE' ) {
+	    $heap->{'after_step'}->( $heap->{'population'}, $arg );
+	} else {
+	    $heap->{'after_step'}->apply( $heap->{'population'}, $arg );
+	}
     }
     $kernel->yield('generation');
 }
@@ -96,7 +111,7 @@ sub generation {
   if ( ! $heap->{'terminator'}->apply( $heap->{'population'} ) ) {
     $kernel->yield( 'finish' );
   } else {
-    $kernel->yield( 'generation' );
+    $kernel->yield( 'after_step' );
   }
 
 }
@@ -180,7 +195,8 @@ POE::Component::Algorithm::Evolutionary->new( Fitness => $rr,
 					      Creator => $creator,
 					      Single_Step => $generation,
 					      Terminator => $gterm,
-					      Alias => 'Canonical' );
+					      Alias => 'Canonical',
+                                              After_Step => $after_step_code);
 
 It's called with all components needed to run an evolutionary
 algorithm; to keep everything flexible they are created in
@@ -197,6 +213,14 @@ Called internally for initializing population
 =head2 generation
 
 This is run once for each generation, until end condition is met
+
+=head2 after_step
+
+Run always after each generation, with hooks so that you can add your
+    own code. The first argument for the subroutine will be a
+    population hash, and the second the argument that the event
+    receives. 
+
 
 =head2 finishing
 
@@ -247,10 +271,10 @@ Copyright (c) 2009, JJ Merelo C<< <jj@merelo.net> >>. All rights reserved.
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
 
-  CVS Info: $Date: 2009/02/11 18:59:30 $ 
-  $Header: /cvsroot/opeal/POE-Component-Algorithm-Evolutionary/lib/POE/Component/Algorithm/Evolutionary.pm,v 1.7 2009/02/11 18:59:30 jmerelo Exp $ 
+  CVS Info: $Date: 2009/02/12 10:09:11 $ 
+  $Header: /cvsroot/opeal/POE-Component-Algorithm-Evolutionary/lib/POE/Component/Algorithm/Evolutionary.pm,v 1.8 2009/02/12 10:09:11 jmerelo Exp $ 
   $Author: jmerelo $ 
-  $Revision: 1.7 $ ' 
+  $Revision: 1.8 $ ' 
 
 =head1 DISCLAIMER OF WARRANTY
 

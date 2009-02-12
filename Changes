@@ -1,3 +1,9 @@
+2009-02-12  Juan J. Merelo  <jmerelo@vega>
+
+	* Makefile.PL: Added an 'after_step' event to make easier do stuff
+	after each generation, changed Makefile and changed to 0.1 since
+	it looks like it already does something useful. 
+
 2009-02-10  jmerelo  <jmerelo@localhost.localdomain>
 
 	* 0.0.4.1 lib/POE/Component/Algorithm/Evolutionary.pm (new): Forgot to include POE in the dependencies.
