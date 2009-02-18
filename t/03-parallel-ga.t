@@ -1,9 +1,11 @@
-#-*- CPerl -*-
+#-*-CPerl-*-
 
 use lib qw( ../../lib ../lib ../../Algorithm-Evolutionary/lib );
 
-use Test::More tests => 5;
-use POE::Component::Algorithm::Evolutionary;
+use Test::More tests => 1;
+use Test::Output;
+
+use POE::Component::Algorithm::Evolutionary::Island::POEtic;
 use POE;
 
 use Algorithm::Evolutionary qw( Individual::BitString Op::Creator 
@@ -38,17 +40,34 @@ my $rr = new  Algorithm::Evolutionary::Fitness::Royal_Road( $block_size );
 # defecto. Los parámetros son la función de fitness, la tasa de selección y los
 # operadores de variación.
 my $generation = Algorithm::Evolutionary::Op::CanonicalGA->new( $rr , $selection_rate , [$m, $c] ) ;
-my $gterm = new Algorithm::Evolutionary::Op::GenerationalTerm 3;
+my $gterm = new Algorithm::Evolutionary::Op::GenerationalTerm 1;
 
-my $poco_ae_session = POE::Component::Algorithm::Evolutionary->new( Fitness => $rr,
-					      Creator => $creator,
-					      Single_Step => $generation,
-					      Terminator => $gterm,
-					      Alias => 'Canonical' );
-
-for my $v ( qw( Fitness Creator Single_step Terminator ) ) {
-    ok( ref $poco_ae_session->$v , "Accessing $v method from AUTOLOAD"); 
+my @nodes = qw( node_1 node_2 );
+my %sessions;
+for my $n ( @nodes ){
+  my @nodes_here = grep( $_ ne $n, @nodes );
+  $sessions{$n} = POE::Component::Algorithm::Evolutionary::Island::POEtic->new( Fitness => $rr,
+										      Creator => $creator,
+										      Single_Step => $generation,
+										      Terminator => $gterm,
+										      Alias => $n,
+										      Peers => \@nodes_here );
+}
+$poe_kernel->run();
+my $this_average = average( $sessions{'node_1'}->population );
+$gterm = new Algorithm::Evolutionary::Op::GenerationalTerm 10;
+#Restart session
+for my $n ( @nodes ){
+  my @nodes_here = grep( $_ ne $n, @nodes );
+  $sessions{$n} = POE::Component::Algorithm::Evolutionary::Island::POEtic->new( Fitness => $rr,
+										      Creator => $creator,
+										      Single_Step => $generation,
+										      Terminator => $gterm,
+										      Alias => $n,
+										      Peers => \@nodes_here );
 }
 
 $poe_kernel->run();
-ok( ref $poco_ae_session->population, "Accesing population" );
+ok( $this_average < average( $sessions{'node_1'}->population ), 'Average improves with GA' );
+
+

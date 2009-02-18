@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use Carp;
 
-use version; our $VERSION = qv('0.1.0');
+use version; our $VERSION = qv('0.2.0');
 
 use POE;
 use Algorithm::Evolutionary;
@@ -38,46 +38,47 @@ sub new {
   my $class = shift;
   my %args = @_;
 
-  my $fitness = delete $args{Fitness} || croak "Fitness required";
-  my $creator = delete $args{Creator} || croak "Creator required";
-  my $single_step = delete $args{Single_Step} || croak "Single_Step required";
-  my $terminator = delete $args{Terminator} || croak "Terminator required";
-  my $alias = delete $args{Alias} || croak "Alias required";
-  my $replacer = delete $args{Replacer};
-  my $after_step = delete $args{After_Step};
+  my $options = {};
+  for my $option ( qw( Fitness Creator Single_Step Terminator Alias ) ) {
+      $options->{lc($option)} = $args{$option} || croak "$option required";
+  }
 
-  my $self = { alias => $alias };
+  for my $option ( qw( Replacer After_Step ) ) {
+      $options->{lc($option)} = $args{$option};
+  }
+  
+  my $self = { alias => $options->{'alias' }};
   bless $self, $class;
 
   my $session = POE::Session->create(inline_states => { _start => \&start,
 							generation => \&generation,
 							after_step => \&after_step,
 							finish => \&finishing},
-				     args  => [$alias, $creator, $single_step, 
-					       $terminator, $fitness, $replacer, $after_step, $self]
+				     args  => [$options->{'alias'}, $self, $options]
 				    );
   $self->{'session'} = $session;
   return $self;
 }
 
+sub _start_base {
+    my ($kernel, $heap, $alias, $self, $options )=
+	    @_[KERNEL, HEAP, ARG0, ARG1, ARG2 ];
+    $kernel->alias_set($alias);
+    for my $option ( keys %$options ) {
+	$heap->{$option} = $options->{$option};
+    }
+    $heap->{'self'} = $self;
+    my @pop;
+    $options->{'creator'}->apply( \@pop );
+    map( $_->evaluate($options->{'fitness'}), @pop );
+    $heap->{'population'} = \@pop;
+    
+}
+
 # Create stuff and get ready to go
 sub start {
-  my ($kernel, $heap, $alias, $creator, 
-      $single_step, $terminator, $fitness, $replacer, $after_step, $self )= 
-	@_[KERNEL, HEAP, ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7];
-  $kernel->alias_set($alias);
-  $heap->{'single_step'} = $single_step;
-  $heap->{'terminator' } = $terminator;
-  $heap->{'creator' } = $creator;
-  $heap->{'fitness' } = $fitness;
-  $heap->{'replacer' } = $replacer;
-  $heap->{'after_step'} = $after_step;
-  $heap->{'self'} = $self;
-  my @pop;
-  $creator->apply( \@pop );
-  map( $_->evaluate($fitness), @pop );
-  $heap->{'population'} = \@pop;
-  $kernel->yield('generation');
+    _start_base( @_ );
+    $_[KERNEL]->yield('generation');
 }
 
 
@@ -271,10 +272,10 @@ Copyright (c) 2009, JJ Merelo C<< <jj@merelo.net> >>. All rights reserved.
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
 
-  CVS Info: $Date: 2009/02/12 10:09:11 $ 
-  $Header: /cvsroot/opeal/POE-Component-Algorithm-Evolutionary/lib/POE/Component/Algorithm/Evolutionary.pm,v 1.8 2009/02/12 10:09:11 jmerelo Exp $ 
+  CVS Info: $Date: 2009/02/13 09:22:57 $ 
+  $Header: /cvsroot/opeal/POE-Component-Algorithm-Evolutionary/lib/POE/Component/Algorithm/Evolutionary.pm,v 1.9 2009/02/13 09:22:57 jmerelo Exp $ 
   $Author: jmerelo $ 
-  $Revision: 1.8 $ ' 
+  $Revision: 1.9 $ ' 
 
 =head1 DISCLAIMER OF WARRANTY
 

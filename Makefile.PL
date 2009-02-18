@@ -13,7 +13,7 @@ WriteMakefile(
 		  'version'    => 0,
 		  'POE'        => 0,
 		  'Test::Output' => 0,
-		  'Algorithm::Evolutionary' => 0.61
+		  'Algorithm::Evolutionary' => 0.64 # this version fixes the problem with Statistic::Basic
 		 },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'POE-Component-Algorithm-Evolutionary-*' },
