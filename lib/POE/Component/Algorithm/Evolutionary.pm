@@ -1,12 +1,12 @@
 package POE::Component::Algorithm::Evolutionary;
 
-use lib qw( ../../../../../Algorithm-Evolutionary/lib ../Algorithm-Evolutionary/lib ); #For development and perl syntax mode
+use lib qw( ../../../../../Algorithm-Evolutionary/lib ../../../../../../Algorithm-Evolutionary/lib ../Algorithm-Evolutionary/lib ); #For development and perl syntax mode
 
 use warnings;
 use strict;
 use Carp;
 
-use version; our $VERSION = qv('0.2.0');
+use version; our $VERSION = qv('0.2.1');
 
 use POE;
 use Algorithm::Evolutionary;

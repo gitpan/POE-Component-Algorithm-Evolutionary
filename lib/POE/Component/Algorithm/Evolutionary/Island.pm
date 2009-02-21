@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION =   sprintf "%d.%03d", q$Revision: 1.2 $ =~ /(\d+)\.(\d+)/g; 
+our $VERSION =   sprintf "%d.%03d", q$Revision: 1.3 $ =~ /(\d+)\.(\d+)/g; 
 
 use POE;
 use base 'POE::Component::Algorithm::Evolutionary';
@@ -142,8 +142,8 @@ Copyright (c) 2009, JJ Merelo C<< <jj@merelo.net> >>. All rights reserved.
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
 
-  CVS Info: $Date: 2009/02/13 09:22:57 $ 
-  $Header: /cvsroot/opeal/POE-Component-Algorithm-Evolutionary/lib/POE/Component/Algorithm/Evolutionary/Island.pm,v 1.2 2009/02/13 09:22:57 jmerelo Exp $ 
+  CVS Info: $Date: 2009/02/21 12:39:19 $ 
+  $Header: /cvsroot/opeal/POE-Component-Algorithm-Evolutionary/lib/POE/Component/Algorithm/Evolutionary/Island.pm,v 1.3 2009/02/21 12:39:19 jmerelo Exp $ 
   $Author: jmerelo $ 
 
 =head1 DISCLAIMER OF WARRANTY

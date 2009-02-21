@@ -1,6 +1,9 @@
 #!/usr/bin/perl
 
-use lib qw( ../../lib ../lib ../../Algorithm-Evolutionary/lib );
+use strict;
+use warnings;
+
+use lib qw( lib ../Algorithm-Evolutionary/lib ../../lib ../lib ../../Algorithm-Evolutionary/lib );
 
 use POE::Component::Algorithm::Evolutionary;
 use POE;

@@ -47,24 +47,24 @@ my %sessions;
 for my $n ( @nodes ){
   my @nodes_here = grep( $_ ne $n, @nodes );
   $sessions{$n} = POE::Component::Algorithm::Evolutionary::Island::POEtic->new( Fitness => $rr,
-										      Creator => $creator,
-										      Single_Step => $generation,
-										      Terminator => $gterm,
-										      Alias => $n,
-										      Peers => \@nodes_here );
+										Creator => $creator,
+										Single_Step => $generation,
+										Terminator => $gterm,
+										Alias => $n,
+										Peers => \@nodes_here );
 }
 $poe_kernel->run();
 my $this_average = average( $sessions{'node_1'}->population );
-$gterm = new Algorithm::Evolutionary::Op::GenerationalTerm 10;
+$gterm = new Algorithm::Evolutionary::Op::GenerationalTerm 20; #Never too safe
 #Restart session
 for my $n ( @nodes ){
   my @nodes_here = grep( $_ ne $n, @nodes );
   $sessions{$n} = POE::Component::Algorithm::Evolutionary::Island::POEtic->new( Fitness => $rr,
-										      Creator => $creator,
-										      Single_Step => $generation,
-										      Terminator => $gterm,
-										      Alias => $n,
-										      Peers => \@nodes_here );
+										Creator => $creator,
+										Single_Step => $generation,
+										Terminator => $gterm,
+										Alias => $n,
+										Peers => \@nodes_here );
 }
 
 $poe_kernel->run();

@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use Carp;
 
-our $VERSION =   sprintf "%d.%03d", q$Revision: 1.1 $ =~ /(\d+)\.(\d+)/g; 
+our $VERSION =   sprintf "%d.%03d", q$Revision: 1.2 $ =~ /(\d+)\.(\d+)/g; 
 
 use POE;
 use base 'POE::Component::Algorithm::Evolutionary::Island';
@@ -33,12 +33,14 @@ __END__
 
 =head1 NAME
 
-POE::Component::Algorithm::Evolutionary::Island - Base class for evolutionary "islands" that interchange information with each other
+POE::Component::Algorithm::Evolutionary::Island::POEtic - Island that
+uses L<POE> mechanisms for interchanging information, and act only as
+POE sessions 
 
 
 =head1 SYNOPSIS
 
-  use POE::Component::Algorithm::Evolutionary::Island;
+  use POE::Component::Algorithm::Evolutionary::Island::POEtic;
 
   use Algorithm::Evolutionary qw( Individual::BitString Op::Creator 
 				  Op::CanonicalGA Op::Bitflip 
@@ -64,31 +66,35 @@ POE::Component::Algorithm::Evolutionary::Island - Base class for evolutionary "i
   my $generation = Algorithm::Evolutionary::Op::CanonicalGA->new( $rr , $selection_rate , [$m, $c] ) ;
   my $gterm = new Algorithm::Evolutionary::Op::GenerationalTerm 10;
 
-  my @peers = qw( peer_1 peer_2 peer_3 ); # Different way of specifying peers, depending on implementation
-  POE::Component::Algorithm::Evolutionary::Island::TypeXXX->new( Fitness => $rr,
-    Creator => $creator,
-    Single_Step => $generation,
-    Terminator => $gterm,
-    Alias => 'Canonical',
-    Peers => \@peers );
+  my @nodes = qw( node_1 node_2 );
+  my %sessions;
+  for my $n ( @nodes ){
+    my @nodes_here = grep( $_ ne $n, @nodes );
+    $sessions{$n} = POE::Component::Algorithm::Evolutionary::Island::POEtic->new( Fitness => $rr,
+										Creator => $creator,
+										Single_Step => $generation,
+										Terminator => $gterm,
+										Alias => $n,
+										Peers => \@nodes_here );
+  }
 
   $poe_kernel->run();
 
 
 =head1 DESCRIPTION
 
-Not a lot here: it creates a component that uses POE to run an
-evolutionary algorithm 
+Using C<post>, this type of island moves individuals from one island
+to another
 
 =head1 INTERFACE 
 
 =head2 new
 
-POE::Component::Algorithm::Evolutionary->new( Fitness => $rr,
+POE::Component::Algorithm::Evolutionary::Island::POEtic->new( Fitness => $rr,
 					      Creator => $creator,
 					      Single_Step => $generation,
 					      Terminator => $gterm,
-					      Alias => 'Canonical',
+					      Alias => 'this_peer',
                                               Peers => \@peers);
 
 Basically like PoCoAE, but with peers
@@ -144,8 +150,8 @@ Copyright (c) 2009, JJ Merelo C<< <jj@merelo.net> >>. All rights reserved.
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
 
-  CVS Info: $Date: 2009/02/13 09:23:56 $ 
-  $Header: /cvsroot/opeal/POE-Component-Algorithm-Evolutionary/lib/POE/Component/Algorithm/Evolutionary/Island/POEtic.pm,v 1.1 2009/02/13 09:23:56 jmerelo Exp $ 
+  CVS Info: $Date: 2009/02/21 12:39:19 $ 
+  $Header: /cvsroot/opeal/POE-Component-Algorithm-Evolutionary/lib/POE/Component/Algorithm/Evolutionary/Island/POEtic.pm,v 1.2 2009/02/21 12:39:19 jmerelo Exp $ 
   $Author: jmerelo $ 
 
 =head1 DISCLAIMER OF WARRANTY
